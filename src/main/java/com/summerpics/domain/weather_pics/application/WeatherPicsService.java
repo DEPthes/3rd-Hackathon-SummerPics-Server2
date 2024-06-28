@@ -48,10 +48,11 @@ public class WeatherPicsService {
         System.out.println("Weather Info: " + weatherInfoRes); // 로그 추가
         String weatherStatus = calculateWeatherStatus(weatherInfoRes.getTempLabel(), weatherInfoRes.getWeatherLabel());
         String picUrl = determineImage(weatherInfoRes.getTempLabel(), weatherInfoRes.getWeatherLabel());
+        int temp = (int) Math.round(weatherInfoRes.getTemperature());
         return WeatherPicRes.builder()
                 .picUrl(picUrl)
                 .weatherStatus(weatherStatus)
-                .temp((int) Math.round(weatherInfoRes.getTemperature()))  // 온도값 설정 (반올림하여 정수형으로 변환)
+                .temp(temp)  // 온도값 설정 (반올림하여 정수형으로 변환)
                 .build();
     }
 
