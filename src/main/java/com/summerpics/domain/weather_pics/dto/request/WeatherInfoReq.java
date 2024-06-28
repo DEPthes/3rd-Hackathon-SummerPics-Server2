@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class WeatherInfoReq {
     private String baseDate;
     private String baseTime;
-    private String nx;
-    private String ny;
+    private int nx;
+    private int ny;
 }

@@ -55,10 +55,12 @@ public class WeatherPicsService {
                 .build();
     }
 
-    private WeatherInfoRes getWeather(String baseDate, String baseTime, String nx, String ny) throws IOException, ParseException {
+    private WeatherInfoRes getWeather(String baseDate, String baseTime, int x, int y) throws IOException, ParseException {
         String type = "json";  // 타입 (xml, json 등)
         String numOfRows = "100";    // 한 페이지 결과 수
         String pageNo = "1"; // 페이지 번호
+        String nx=String.valueOf(x);
+        String ny=String.valueOf(y);
 
         // URL 빌더
         StringBuilder urlBuilder = new StringBuilder(apiUrl);
