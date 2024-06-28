@@ -5,7 +5,10 @@ import com.summerpics.domain.temp_info.domain.TempLabel;
 import com.summerpics.domain.weather_info.domain.WeatherLabel;
 import com.summerpics.domain.weather_pics.domain.WeatherPics;
 import com.summerpics.domain.weather_pics.domain.repository.WeatherPicsRepository;
+import com.summerpics.domain.weather_pics.dto.WeatherPicsRankDTO;
+import com.summerpics.domain.weather_pics.dto.request.ThumsReq;
 import com.summerpics.domain.weather_pics.dto.request.WeatherInfoReq;
+import com.summerpics.domain.weather_pics.dto.response.ThumsRes;
 import com.summerpics.domain.weather_pics.dto.response.WeatherInfoRes;
 import com.summerpics.domain.weather_pics.dto.response.WeatherPicRes;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,7 +28,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -238,5 +243,50 @@ public class WeatherPicsService {
                 break;
         }
         return weatherStatus;
+    }
+
+    // 좋아요 수 업데이트
+    public ThumsRes updateThums(ThumsReq thumsReq) {
+        Optional<WeatherPics> optionalWeatherPics = weatherPicsRepository.findById(thumsReq.getPicture_id());
+        if (optionalWeatherPics.isPresent()) {
+            WeatherPics weatherPics = optionalWeatherPics.get();
+            int updateThums = weatherPics.getThums() + 1;
+            weatherPics = new WeatherPics(weatherPics.getPictureId(), weatherPics.getPictureUrl(), updateThums, weatherPics.getTitle());
+            weatherPicsRepository.save(weatherPics);
+            return new ThumsRes(weatherPics.getPictureId(), weatherPics.getThums());
+        } else {
+            throw new IllegalArgumentException("Invalid picture_id");
+        }
+    }
+
+    // 좋아요 취소
+    public ThumsRes cancelThums(ThumsReq thumsReq) {
+        Optional<WeatherPics> optionalWeatherPics = weatherPicsRepository.findById(thumsReq.getPicture_id());
+        if (optionalWeatherPics.isPresent()) {
+            WeatherPics weatherPics = optionalWeatherPics.get();
+            int updatedThums = weatherPics.getThums() > 0 ? weatherPics.getThums() - 1 : 0;
+            weatherPics = new WeatherPics(weatherPics.getPictureId(), weatherPics.getPictureUrl(), updatedThums, weatherPics.getTitle());
+            weatherPicsRepository.save(weatherPics);
+            return new ThumsRes(weatherPics.getPictureId(), weatherPics.getThums());
+        } else {
+            throw new IllegalArgumentException("Invalid picture_id");
+        }
+    }
+
+    // 상위 짤 리스트
+    public List<WeatherPicsRankDTO> getWeatherPicsRank() {
+        List<WeatherPicsRankDTO> rankList = weatherPicsRepository.findTopRankings()
+                .stream()
+                .filter(wp -> wp.getThums() > 0)    // 좋아요 수가 0인 항목 제외
+                .limit(10)  // 상위 10개만 출력
+                .map(weatherPics -> new WeatherPicsRankDTO(
+                        weatherPics.getPictureId(),
+                        weatherPics.getPictureUrl(),
+                        weatherPics.getThums(),
+                        weatherPics.getTitle()
+                ))
+                .collect(Collectors.toList());
+
+        return rankList;
     }
 }
