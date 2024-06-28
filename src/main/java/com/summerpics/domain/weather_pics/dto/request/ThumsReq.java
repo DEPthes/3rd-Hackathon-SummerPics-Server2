@@ -1,4 +1,4 @@
-package com.summerpics.domain.weather_pics.dto.response;
+package com.summerpics.domain.weather_pics.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThumsResponseDTO {
+public class ThumsReq {
     private long picture_id;
-    private int thums;
+    private boolean like;   // true : like, false : unlike
 }
